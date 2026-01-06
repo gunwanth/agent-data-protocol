@@ -3,29 +3,25 @@ import os
 import re
 import sys
 
+from agents.openhands.std_to_sft import main_with_args as main_openhands
 from schema.trajectory import Trajectory
 
 dataset = os.getenv("MY_DATASET")
 assert dataset, "Please set the environment variable MY_DATASET"
 
-with open("agents/agentlab/system.txt") as f:
-    system = f.read()
+system = "# Instructions\nYou are a UI Assistant, your goal is to help the user perform tasks using a web browser. \nReview the instructions from the user, the current state of the page and all other information to find the best possible next action to accomplish your goal. Your answer will be interpreted and executed by a program, make sure to follow the formatting instructions.\n"
 with open("agents/agentlab/action_space.txt") as f:
     action_space = f.read().strip()
 with open("agents/agentlab/suffix.txt") as f:
     suffix = f.read().strip()
 
 
-def process_row(line, id_to_openhands_sft):
+def process_row(line):
     std_dataset = [json.loads(line)]
     std_data = std_dataset[0]
     trajectory = Trajectory(**std_data)
     events = trajectory.content
-    if trajectory.id not in id_to_openhands_sft:
-        print(f"{trajectory.id} not found", file=sys.stderr)
-        return None
-    output_line = id_to_openhands_sft[trajectory.id]
-    # output_line = json.loads(main_openhands(line, is_web=True, api_env="browser"))
+    output_line = json.loads(main_openhands(line, is_web=True, api_env="browser"))
     goal = "# Goal\n" + events[0].content + "\n\n"
     past_actions = []
     observation = ""
@@ -87,15 +83,8 @@ def process_row(line, id_to_openhands_sft):
 
 
 def main():
-    with open(
-        "/home/yueqis/agent-data-protocol/datasets/mind2web/full_sft/full_sft_openhands.jsonl"
-    ) as f:
-        f = f.readlines()
-    openhands_sft = [json.loads(line) for line in f]
-    id_to_openhands_sft = {line["id"]: line for line in openhands_sft}
-
     for line in sys.stdin:
-        output_lines = process_row(line, id_to_openhands_sft)
+        output_lines = process_row(line)
         if output_lines:
             for output_line in output_lines:
                 output_line = json.dumps(output_line)
