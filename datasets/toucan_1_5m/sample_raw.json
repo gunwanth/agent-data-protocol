@@ -44,14 +44,8 @@
           "parameters": {
             "type": "object",
             "properties": {
-              "query": {
-                "type": "string",
-                "description": "Search query"
-              },
-              "numResults": {
-                "type": "number",
-                "description": "Number of search results to return (default: 5)"
-              }
+              "query": {"type": "string", "description": "Search query"},
+              "numResults": {"type": "number", "description": "Number of search results to return (default: 5)"}
             },
             "required": ["query"]
           }
@@ -64,12 +58,7 @@
     "metadata": {
       "prompt_id": "00000012",
       "row_id": 12,
-      "mcp_servers": [
-        {
-          "server_id": 462,
-          "server_name": "exa-search"
-        }
-      ]
+      "mcp_servers": [{"server_id": 462, "server_name": "exa-search"}]
     }
   }
 ]
